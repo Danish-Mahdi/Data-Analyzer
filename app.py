@@ -1,9 +1,6 @@
 import streamlit as st
 import pdfkit
-
 import datahelper
-
-# check
 import base64
 from io import BytesIO
 
@@ -18,21 +15,16 @@ def fig_to_base64(fig):
     buf.close()
     return img_base64
 
-# check
-
 if "dataload" not in st.session_state:
     st.session_state.dataload = False
 
-
 def activate_dataload():
     st.session_state.dataload = True
-
 
 st.set_page_config(page_title="Data Analyzer 🤖", layout="wide")
 st.image("./image/banner2.png", use_container_width=True)
 st.title("🤖 LLM Agent Data analyzer ")
 st.divider()
-
 
 # Sidebar
 st.sidebar.subheader("Load your data")
@@ -44,17 +36,13 @@ load_data_btn = st.sidebar.button(
 )
 
 # Main
-
 col_prework, col_dummy, col_interaction = st.columns([4, 1, 7])
-
 if st.session_state.dataload:
-
     @st.cache_data
     def summerize():
         loaded_file.seek(0)
         data_summary = datahelper.summerize_csv(filename=loaded_file)
         return data_summary
-
     data_summary = summerize()
 
     with col_prework:
@@ -77,23 +65,16 @@ if st.session_state.dataload:
         st.subheader("Data Types Summary")
         st.markdown("This section shows the data types and non-null counts for each column.")
         st.text(data_summary["data_types"])  # Display the captured info
-
-
-
-
-
         st.divider()
         st.subheader("WordClouds for Text Columns")
 
         wordcloud_images = data_summary.get("wordcloud_images", {})
-
         if wordcloud_images:
             for col_name, img_base64 in wordcloud_images.items():
                 st.markdown(f"**WordCloud for column: `{col_name}`**")
                 st.image(f"data:image/png;base64,{img_base64}", use_container_width=True)
         else:
             st.warning("No suitable text columns found for WordCloud generation.")
-
 
     with col_dummy:
         st.empty()
@@ -152,14 +133,10 @@ if st.session_state.dataload:
         sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", ax=ax)
         st.pyplot(fig)
 
-
-                # Path where wkhtmltopdf is installed
+        # Path where wkhtmltopdf is installed
         path_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
         config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
                
-          
-
-
         def generate_html_report(data_summary, correlation_fig_base64, wordcloud_images):
             wordcloud_html = ""
 
@@ -233,9 +210,6 @@ if st.session_state.dataload:
             </html>
             """
             return html_content
-
-
-
             
     correlation_fig_base64 = fig_to_base64(fig)
     wordcloud_images = data_summary.get("wordcloud_images", {})
